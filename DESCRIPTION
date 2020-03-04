@@ -15,7 +15,8 @@ Depends:
 Imports:
     magrittr,
     jsonlite,
-    callr
+    callr,
+    openssl
 Suggests:
     httpuv,
     knitr,
