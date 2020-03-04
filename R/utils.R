@@ -7,6 +7,13 @@ phantom_run <- function(args, wait = TRUE, quiet = FALSE) {
   # Make sure args is a char vector
   args <- as.character(args)
 
+  # Backup OPENSSL_CONF
+  ssl_conf_path <- Sys.getenv(x = "OPENSSL_CONF", unset = NA)
+
+  default_ssl_conf <- system.file("openssl.cnf", package = "webshot")
+
+  Sys.setenv("OPENSSL_CONF" = default_ssl_conf)
+
   p <- callr::process$new(
     phantom_bin,
     args = args,
@@ -17,6 +24,12 @@ phantom_run <- function(args, wait = TRUE, quiet = FALSE) {
   if (isTRUE(wait)) {
     on.exit({
       p$kill()
+      if (is.na(ssl_conf_path)) {
+        Sys.unsetenv("OPENSSL_CONF")
+      } else {
+        # Restore OPENSSL_CONF to its original value
+        Sys.setenv("OPENSSL_CONF" = ssl_conf_path)
+      }
     })
     cat_n <- function(txt) {
       if (length(txt) > 0) {
